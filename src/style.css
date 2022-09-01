@@ -1,0 +1,26 @@
+html {
+  font-family: system-ui;
+  box-sizing: border-box;
+}
+
+*::before, *::after {
+  box-sizing: inherit;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+trix-editor {
+  flex-grow: 1;
+  min-height: 40vh;
+}
+
+textarea {
+  opacity: 0.5;
+  padding: 0.4em 0.6em;
+  margin: 1em 0;
+  min-height: 30vh;
+  max-height: 40vh;
+}

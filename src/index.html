@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trix to Markdown Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel='stylesheet' href='https://cdn.skypack.dev/trix/dist/trix.css'>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<trix-editor md-input="md-message" class="trix-content"></trix-editor>
+
+<textarea id="md-message" readonly>
+The quick
+
+brown fox
+=========
+
+* _jumps over_
+* the **lazy**
+
+&gt; [dog](https://example.org).
+</textarea>
+</body>
+<script type="module">
+    addEventListener("DOMContentLoaded", () => import("https://cdn.skypack.dev/trix"))
+    import TurndownService from "https://cdn.skypack.dev/turndown"
+
+    const turndownService = new TurndownService
+    const htmlToMarkdown = html => turndownService.turndown(html)
+
+    addEventListener("trix-initialize", ({target}) => {
+        const inputId = target.getAttribute("md-input")
+        const input = document.getElementById(inputId)
+        if (!input) return
+
+        target.value = marked.parse(input.value)
+
+        target.addEventListener("trix-change", () => {
+            input.value = htmlToMarkdown(target.value)
+        })
+    })
+
+    function uploadAttachment(attachment) {
+        const reader = new FileReader();
+        // Set the reader to insert images when they are loaded.
+        reader.onload = function (e) {
+            const result = e.target.result;
+            const attrs = {
+                src: result,
+                url: result,
+                href: result
+            };
+            attachment.setAttributes(attrs)
+            attachment.setUploadProgress(100);
+        }
+        reader.onprogress = function (e) {
+            if (e.lengthComputable) {
+                const progress = 100 * e.loaded / e.total
+                console.log(progress)
+                attachment.setUploadProgress(progress);
+            }
+        }
+
+        // Read image as base64.
+        reader.readAsDataURL(attachment.file);
+    }
+
+    addEventListener("trix-attachment-add", function (event) {
+        if (event.attachment.file) {
+            uploadAttachment(event.attachment)
+        }
+    })
+</script>
+</html>
